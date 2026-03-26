@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fantasy Trope Matcher — Which Story Was Written For You?</title>
+  <meta name="description" content="Discover your fantasy romance tropes and find your perfect book match. Take the quiz and share your results with friends!">
+  <meta property="og:title" content="Fantasy Trope Matcher — Which Story Was Written For You?">
+  <meta property="og:description" content="Are you enemies-to-lovers? Chosen one? Take the quiz and get matched to your next obsession.">
+  <meta property="og:image" content="https://edwardbrooks.kdp.amzn.com/og-trope-matcher.png">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #d4a843;
+      --dark: #0d0d1a;
+      --card-bg: #13132a;
+      --accent: #8b6fc2;
+      --accent2: #c96090;
+      --text: #e8e0f0;
+      --muted: #9090b0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--dark);
+      color: var(--text);
+      font-family: 'Lato', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background-image: 
+        radial-gradient(ellipse at 20% 20%, rgba(139,111,194,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(201,96,144,0.10) 0%, transparent 60%);
+    }
+    #app {
+      max-width: 660px;
+      width: 100%;
+    }
+    .hero {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .hero h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2rem, 6vw, 3rem);
+      color: var(--gold);
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+    .hero p {
+      color: var(--muted);
+      font-size: 1.1rem;
+      margin-bottom: 24px;
+      max-width: 460px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .btn-start {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      padding: 16px 44px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(139,111,194,0.4);
+    }
+    .btn-start:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(139,111,194,0.5); }
+
+    /* QUIZ */
+    .quiz-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 36px 32px;
+      border: 1px solid rgba(212,168,67,0.15);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+    .progress-bar {
+      background: rgba(255,255,255,0.08);
+      border-radius: 99px;
+      height: 6px;
+      margin-bottom: 28px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      background: linear-gradient(90deg, var(--accent), var(--gold));
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.4s ease;
+    }
+    .q-num {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    .q-text {
+      font-family: 'Cinzel', serif;
+      font-size: 1.2rem;
+      color: var(--gold);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .option-btn {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: var(--text);
+      font-size: 1rem;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      line-height: 1.4;
+    }
+    .option-btn:hover {
+      background: rgba(139,111,194,0.2);
+      border-color: var(--accent);
+      transform: translateX(4px);
+    }
+    .option-btn.selected {
+      background: rgba(139,111,194,0.3);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    /* EMAIL GATE */
+    .email-gate {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 40px 32px;
+      border: 1px solid rgba(212,168,67,0.2);
+      text-align: center;
+    }
+    .email-gate h2 {
+      font-family: 'Cinzel', serif;
+      color: var(--gold);
+      font-size: 1.6rem;
+      margin-bottom: 12px;
+    }
+    .email-gate p { color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+    .email-input {
+      width: 100%;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 14px 16px;
+      color: var(--text);
+      font-size: 1rem;
+      margin-bottom: 12px;
+      outline: none;
+    }
+    .email-input:focus { border-color: var(--accent); }
+    .btn-reveal {
+      width: 100%;
+      background: linear-gradient(135deg, var(--gold), #b8893a);
+      color: #0d0d1a;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .btn-reveal:hover { transform: translateY(-2px); }
+    .skip-link {
+      display: block;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    /* RESULTS */
+    .results-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 40px 32px;
+      border: 1px solid rgba(212,168,67,0.25);
+      text-align: center;
+    }
+    .result-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 50px;
+      padding: 6px 18px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 16px;
+    }
+    .result-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      color: var(--gold);
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+    .result-subtitle {
+      color: var(--accent);
+      font-size: 1rem;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+    .trope-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+    .trope-pill {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+    .result-desc {
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 28px;
+      font-size: 0.95rem;
+    }
+    .kdp-cta {
+      background: linear-gradient(135deg, rgba(212,168,67,0.1), rgba(201,96,144,0.1));
+      border: 1px solid rgba(212,168,67,0.3);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .kdp-cta p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .kdp-cta strong { color: var(--gold); }
+    .btn-amazon {
+      display: inline-block;
+      background: linear-gradient(135deg, #f90, #e47911);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 28px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.2s;
+      margin: 4px;
+    }
+    .btn-amazon:hover { transform: translateY(-2px); }
+    .share-section h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+    .share-btns {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .share-btn {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .share-btn:hover { transform: translateY(-2px); }
+    .share-tiktok { background: #010101; color: #fff; }
+    .share-twitter { background: #1da1f2; color: #fff; }
+    .share-ig { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: #fff; }
+    .share-copy { background: rgba(255,255,255,0.1); color: var(--text); border: 1px solid rgba(255,255,255,0.2); }
+    .btn-retry {
+      margin-top: 20px;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--muted);
+      border-radius: 8px;
+      padding: 10px 24px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-retry:hover { border-color: var(--accent); color: var(--text); }
+    .sparkles { font-size: 2rem; margin-bottom: 12px; }
+    .copy-toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--card-bg);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 10px 24px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: transform 0.3s ease;
+      pointer-events: none;
+    }
+    .copy-toast.show { transform: translateX(-50%) translateY(0); }
+    @media (max-width: 480px) {
+      .quiz-card, .email-gate, .results-card { padding: 24px 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <div class="copy-toast" id="copyToast">✓ Copied to clipboard!</div>
+
+  <script>
+    const QUESTIONS = [
+      {
+        text: "When you meet someone who opposes everything you stand for, your first instinct is...",
+        options: [
+          { text: "Clash hard — conflict reveals true character", tropes: ["enemies-to-lovers", "forbidden-bond"] },
+          { text: "Study them from a distance — knowledge is power", tropes: ["chosen-one", "slow-burn"] },
+          { text: "Challenge them to prove I'm better", tropes: ["rivals-to-lovers", "battle-magic"] },
+          { text: "Find the thread of understanding between you", tropes: ["fated-mates", "redemption-arc"] }
+        ]
+      },
+      {
+        text: "Your idea of ultimate power is...",
+        options: [
+          { text: "Magic you were born into — ancient, unstoppable", tropes: ["chosen-one", "battle-magic"] },
+          { text: "Power earned through sacrifice and loss", tropes: ["redemption-arc", "dark-protector"] },
+          { text: "The loyalty of people who would die for you", tropes: ["warrior-queen", "fated-mates"] },
+          { text: "Knowing secrets no one else dares to uncover", tropes: ["forbidden-bond", "slow-burn"] }
+        ]
+      },
+      {
+        text: "The romance you crave most reads like...",
+        options: [
+          { text: "Two people who can't stand each other... until they can't live without each other", tropes: ["enemies-to-lovers", "rivals-to-lovers"] },
+          { text: "A love that was written in the stars before they were born", tropes: ["fated-mates", "chosen-one"] },
+          { text: "A dark, broken soul protecting someone who sees through all his walls", tropes: ["dark-protector", "redemption-arc"] },
+          { text: "A slow build that makes you scream \"JUST KISS ALREADY\"", tropes: ["slow-burn", "forbidden-bond"] }
+        ]
+      },
+      {
+        text: "In a battle, you are...",
+        options: [
+          { text: "The one at the front who doesn't flinch", tropes: ["warrior-queen", "battle-magic"] },
+          { text: "The strategist who planned three moves ahead", tropes: ["chosen-one", "slow-burn"] },
+          { text: "The wildcard who breaks every rule", tropes: ["enemies-to-lovers", "forbidden-bond"] },
+          { text: "The one who fights for something, not just to win", tropes: ["redemption-arc", "fated-mates"] }
+        ]
+      },
+      {
+        text: "The setting that would pull you deepest into a story...",
+        options: [
+          { text: "A world of fallen gods and divine weapons", tropes: ["battle-magic", "chosen-one"] },
+          { text: "A court of whispers, alliances, and buried knives", tropes: ["rivals-to-lovers", "dark-protector"] },
+          { text: "Ancient magic meeting modern defiance", tropes: ["forbidden-bond", "warrior-queen"] },
+          { text: "An empire built on sacrifice — and one woman who refuses to bow", tropes: ["warrior-queen", "fated-mates"] }
+        ]
+      },
+      {
+        text: "Your biggest flaw when you're in love...",
+        options: [
+          { text: "You push everyone away before they can leave", tropes: ["dark-protector", "redemption-arc"] },
+          { text: "You burn the world down for the people you love", tropes: ["warrior-queen", "battle-magic"] },
+          { text: "You see it coming for months and still pretend you don't feel it", tropes: ["slow-burn", "enemies-to-lovers"] },
+          { text: "You trust fate over common sense", tropes: ["fated-mates", "chosen-one"] }
+        ]
+      },
+      {
+        text: "The moment that makes a book legendary for you...",
+        options: [
+          { text: "\"I hate you,\" she said — and kissed him anyway", tropes: ["enemies-to-lovers", "rivals-to-lovers"] },
+          { text: "She finally unlocked the power she was told she'd never have", tropes: ["chosen-one", "battle-magic"] },
+          { text: "He stepped between her and death without hesitation", tropes: ["dark-protector", "fated-mates"] },
+          { text: "The moment they both admitted they'd been choosing each other all along", tropes: ["slow-burn", "redemption-arc"] }
+        ]
+      },
+      {
+        text: "If you had magic, it would be...",
+        options: [
+          { text: "Divine combat magic — forged from pain and fire", tropes: ["battle-magic", "warrior-queen"] },
+          { text: "Enchantment — bending reality and minds", tropes: ["forbidden-bond", "dark-protector"] },
+          { text: "Prophecy sight — you were always meant for more", tropes: ["chosen-one", "fated-mates"] },
+          { text: "Healing — you've survived enough to know how to mend", tropes: ["redemption-arc", "slow-burn"] }
+        ]
+      }
+    ];
+
+    const RESULTS = {
+      "enemies-to-lovers": {
+        label: "Enemies-to-Lovers",
+        emoji: "⚔️",
+        desc: "You don't fall gently — you collide. The tension is everything. You live for the moment hatred flips, the breath that shifts between a glare and a kiss. Your matches spar with wit, bleed the same way, and can't escape the gravity between them.",
+        book: "imani",
+        bookTitle: "Imani: The Warrior Nun",
+        bookDesc: "Imani knows what it's like to stand against someone who challenges every belief — and still feel the pull. Her story is your story.",
+        amazonUrl: "https://www.amazon.com/author/edwardbrooks",
+        color: "#c96090"
+      },
+      "chosen-one": {
+        label: "The Chosen One",
+        emoji: "✨",
+        desc: "You believe in destiny — not as a comfort, but as a weight. You were marked for something before you had a choice. Your story isn't about finding power. It's about surviving what power costs.",
+        book: "amara",
+        bookTitle: "Amara: The Enchantress",
+        bookDesc: "Amara was chosen by forces older than kingdoms. The magic chose her. Now she must decide if she accepts the throne or burns it down.",
+        amazonUrl: "https://www.amazon.com/author/edwardbrooks",
+        color: "#8b6fc2"
+      },
+      "warrior-queen": {
+        label: "Warrior Queen",
+        emoji: "👑",
+        desc: "You don't wait to be rescued. You are the rescue. Power isn't something handed to you — it's something you took, built, and will defend with everything you have. Your love story is between equals who've both bled for what they believe in.",
+        book: "wendy",
+        bookTitle: "Wendy: The Chosen Empress",
+        bookDesc: "Wendy built an empire from nothing. She wasn't given a crown — she forged one. Your energy is her energy.",
+        amazonUrl: "https://www.amazon.com/author/edwardbrooks",
+        color: "#d4a843"
+      },
+      "fated-mates": {
+        label: "Fated Mates",
+        emoji: "🌙",
+        desc: "You believe some connections are written before they happen. Recognition is instant, the pull is irresistible, and walking away feels like fighting gravity. You want a love that the universe itself conspires toward.",
+        book: "wendy",
+        bookTitle: "Wendy: The Chosen Empress",
+        bookDesc: "In Wendy's world, fate and power are inseparable — and her bond was sealed before she knew his name.",
+        amazonUrl: "https://www.amazon.com/author/edwardbrooks",
+        color: "#d4a843"
+      },
+      "dark-protector": {
+        label: "The Dark Protector",
+        emoji: "🖤",
+        desc: "You love characters who've been damaged by the world but would quietly set it on fire to protect the one they love. The brooding protector with walls ten feet thick — until the right person makes them crumble.",
+        book: "imani",
+        bookTitle: "Imani: The Warrior Nun",
+        bookDesc: "Imani's world is full of protectors who had to choose between their darkness and their devotion. Sound familiar?",
+        amazonUrl: "https://www.amazon.com/author/edwardbrooks",
+        color: "#c96090"
+      },
+      "slow-burn": {
+        label: "Slow Burn Devotion",
+        emoji: "🕯️",
+        desc: "You are a patient reader and an intense lover of tension. You don't want the shortcut — you want the 300-page build where every stolen glance matters. When it finally happens, you want to have *earned* it.",
+        book: "amara",
+        bookTitle: "Amara: The Enchantress",
+        bookDesc: "Amara's story is built on patience, power, and the slow recognition of something deeper than magic between two people who keep finding each other.",
+        amazonUrl: "https://www.amazon.com/author/edwardbrooks",
+        color: "#8b6fc2"
+      },
+      "battle-magic": {
+        label: "Battle-Forged Magic",
+        emoji: "🔥",
+        desc: "For you, magic isn't an accessory — it's a weapon honed in blood. You want your protagonists in the thick of it, using power that costs them something real. The bigger the stakes, the deeper you're in.",
+        book: "imani",
+        bookTitle: "Imani: The Warrior Nun",
+        bookDesc: "Imani wields divine combat magic forged through impossible trials. If battle-forged power calls to you, you need to read her origin.",
+        amazonUrl: "https://www.amazon.com/author/edwardbrooks",
+        color: "#c96090"
+      },
+      "forbidden-bond": {
+        label: "Forbidden Bond",
+        emoji: "🌹",
+        desc: "You love a love that breaks rules — because the rules were wrong. Forbidden doesn't mean impossible. It means the story had to fight for itself, and the love that survives that fight is the realest thing in the world.",
+        book: "amara",
+        bookTitle: "Amara: The Enchantress",
+        bookDesc: "Amara walks between worlds that were never meant to touch. The bond she forms was forbidden by every law — and worth every consequence.",
+        amazonUrl: "https://www.amazon.com/author/edwardbrooks",
+        color: "#8b6fc2"
+      },
+      "redemption-arc": {
+        label: "Redemption Arc",
+        emoji: "🌅",
+        desc: "You believe people are more than their worst moments. The character who fell and clawed their way back — that's your person. Not despite their damage, but because of what they do with it.",
+        book: "wendy",
+        bookTitle: "Wendy: The Chosen Empress",
+        bookDesc: "Wendy didn't start out as an empress. She started as someone who had lost everything. Her arc is the arc of choosing to rise.",
+        amazonUrl: "https://www.amazon.com/author/edwardbrooks",
+        color: "#d4a843"
+      },
+      "rivals-to-lovers": {
+        label: "Rivals-to-Lovers",
+        emoji: "🗡️",
+        desc: "Competition is foreplay to you. You want the push and pull, the character who sees your protagonist *clearly* — flaws and all — and still chooses to want them. The rivalry was never really about winning.",
+        book: "wendy",
+        bookTitle: "Wendy: The Chosen Empress",
+        bookDesc: "In Wendy's empire, rivals are the only ones who know you well enough to truly see you. Her greatest rival became her greatest story.",
+        amazonUrl: "https://www.amazon.com/author/edwardbrooks",
+        color: "#d4a843"
+      }
+    };
+
+    let currentQ = 0;
+    let scores = {};
+    let emailCaptured = false;
+
+    function init() {
+      renderHero();
+    }
+
+    function renderHero() {
+      document.getElementById('app').innerHTML = `
+        <div class="hero">
+          <div class="sparkles">✨📚⚔️</div>
+          <h1>Fantasy Trope Matcher</h1>
+          <p>Which romance tropes are written into your soul? Take the quiz, discover your signature tropes, and find the fantasy series that was made for you.</p>
+          <button class="btn-start" onclick="startQuiz()">Reveal My Tropes →</button>
+          <p style="margin-top:16px; font-size:0.8rem; color:var(--muted)">8 questions · 2 minutes · Shareable results</p>
+        </div>
+      `;
+    }
+
+    function startQuiz() {
+      currentQ = 0;
+      scores = {};
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const q = QUESTIONS[currentQ];
+      const progress = ((currentQ) / QUESTIONS.length) * 100;
+      document.getElementById('app').innerHTML = `
+        <div class="quiz-card">
+          <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+          <div class="q-num">Question ${currentQ + 1} of ${QUESTIONS.length}</div>
+          <div class="q-text">${q.text}</div>
+          <div class="options">
+            ${q.options.map((o, i) => `
+              <button class="option-btn" onclick="selectOption(${i})">${o.text}</button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function selectOption(idx) {
+      const q = QUESTIONS[currentQ];
+      const option = q.options[idx];
+      option.tropes.forEach(t => { scores[t] = (scores[t] || 0) + 1; });
+
+      // brief visual feedback
+      const btns = document.querySelectorAll('.option-btn');
+      btns[idx].classList.add('selected');
+
+      setTimeout(() => {
+        currentQ++;
+        if (currentQ < QUESTIONS.length) {
+          renderQuestion();
+        } else if (!emailCaptured) {
+          renderEmailGate();
+        } else {
+          renderResults();
+        }
+      }, 350);
+    }
+
+    function renderEmailGate() {
+      document.getElementById('app').innerHTML = `
+        <div class="email-gate">
+          <div class="sparkles">🔮</div>
+          <h2>Your Tropes Are Ready</h2>
+          <p>Drop your email to unlock your full trope profile + a free chapter from your matched series.</p>
+          <input type="email" class="email-input" id="emailInput" placeholder="your@email.com">
+          <button class="btn-reveal" onclick="submitEmail()">Reveal My Match →</button>
+          <span class="skip-link" onclick="skipEmail()">Skip for now</span>
+        </div>
+      `;
+    }
+
+    function submitEmail() {
+      const email = document.getElementById('emailInput').value;
+      if (email && email.includes('@')) {
+        // In production: POST to email capture endpoint / n8n webhook
+        console.log('Email captured:', email);
+        emailCaptured = true;
+      }
+      renderResults();
+    }
+
+    function skipEmail() {
+      emailCaptured = true;
+      renderResults();
+    }
+
+    function getTopTropes() {
+      return Object.entries(scores)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([trope]) => trope);
+    }
+
+    function renderResults() {
+      const topTropes = getTopTropes();
+      const primary = topTropes[0];
+      const result = RESULTS[primary] || RESULTS["chosen-one"];
+
+      const tropeLabels = topTropes.map(t => RESULTS[t]?.label || t);
+      const shareText = `I'm "${result.label}" energy ✨ My top fantasy romance tropes: ${tropeLabels.join(' · ')} — Take the trope quiz:`;
+      const shareUrl = 'https://edwardbrooks-trope-matcher.netlify.app';
+
+      document.getElementById('app').innerHTML = `
+        <div class="results-card">
+          <div class="sparkles">${result.emoji}</div>
+          <div class="result-badge" style="background: linear-gradient(135deg, ${result.color}88, ${result.color})">Your Primary Trope</div>
+          <div class="result-title">${result.label}</div>
+          <div class="result-subtitle">You're also: ${tropeLabels.slice(1).join(' & ')}</div>
+          <div class="trope-pills">
+            ${tropeLabels.map(l => `<span class="trope-pill">${l}</span>`).join('')}
+          </div>
+          <div class="result-desc">${result.desc}</div>
+          <div class="kdp-cta">
+            <p>✨ <strong>Your perfect match:</strong> ${result.bookTitle}</p>
+            <p>${result.bookDesc}</p>
+            <a href="${result.amazonUrl}" target="_blank" rel="noopener" class="btn-amazon">📖 Read on Amazon</a>
+          </div>
+          <div class="share-section">
+            <h3>Challenge your BookTok friends 👇</h3>
+            <div class="share-btns">
+              <button class="share-btn share-tiktok" onclick="shareTikTok('${encodeURIComponent(shareText + ' ' + shareUrl)}')">🎵 TikTok</button>
+              <button class="share-btn share-twitter" onclick="shareTwitter('${encodeURIComponent(shareText)}', '${encodeURIComponent(shareUrl)}')">🐦 Twitter</button>
+              <button class="share-btn share-copy" onclick="copyResult('${encodeURIComponent(shareText + ' ' + shareUrl)}')">📋 Copy</button>
+            </div>
+          </div>
+          <button class="btn-retry" onclick="startQuiz()">Retake Quiz</button>
+        </div>
+      `;
+    }
+
+    function shareTikTok(text) {
+      // TikTok doesn't have web share API — copy to clipboard and open TikTok
+      copyToClipboard(decodeURIComponent(text));
+      window.open('https://www.tiktok.com', '_blank');
+    }
+
+    function shareTwitter(text, url) {
+      window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=600,height=400');
+    }
+
+    function copyResult(text) {
+      copyToClipboard(decodeURIComponent(text));
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        const toast = document.getElementById('copyToast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>
