@@ -591,8 +591,20 @@
     function submitEmail() {
       const email = document.getElementById('emailInput').value;
       if (email && email.includes('@')) {
-        // In production: POST to email capture endpoint / n8n webhook
-        console.log('Email captured:', email);
+        // POST to n8n webhook for KDP marketing list
+        const payload = {
+          email: email,
+          topTropes: getTopTropes(),
+          result: getTopTropes()[0],
+          timestamp: new Date().toISOString(),
+          source: 'fantasy-trope-matcher',
+          userAgent: navigator.userAgent
+        };
+        fetch('http://10.0.0.237:30109/webhook/trope-matcher-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(err => console.error('Email webhook error:', err));
         emailCaptured = true;
       }
       renderResults();
