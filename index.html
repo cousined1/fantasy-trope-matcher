@@ -582,30 +582,43 @@
           <h2>Your Tropes Are Ready</h2>
           <p>Drop your email to unlock your full trope profile + a free chapter from your matched series.</p>
           <input type="email" class="email-input" id="emailInput" placeholder="your@email.com">
+          <label style="display:block; margin:8px 0 12px; font-size:0.85rem; color:var(--muted); text-align:left;">
+            <input type="checkbox" id="consentCheckbox">
+            I agree to data processing for quiz results and marketing updates.
+          </label>
           <button class="btn-reveal" onclick="submitEmail()">Reveal My Match →</button>
           <span class="skip-link" onclick="skipEmail()">Skip for now</span>
         </div>
       `;
     }
 
-    function submitEmail() {
+    async function submitEmail() {
       const email = document.getElementById('emailInput').value;
+      const consent = document.getElementById('consentCheckbox')?.checked;
+      if (!consent) return;
       if (email && email.includes('@')) {
+        const topTropes = getTopTropes();
         // POST to n8n webhook for KDP marketing list
         const payload = {
           email: email,
-          topTropes: getTopTropes(),
-          result: getTopTropes()[0],
+          topTropes: topTropes,
+          result: topTropes[0],
           timestamp: new Date().toISOString(),
           source: 'fantasy-trope-matcher',
-          userAgent: navigator.userAgent
+          consent: true,
+          consentTimestamp: new Date().toISOString()
         };
-        fetch('http://10.0.0.237:30109/webhook/trope-matcher-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        }).catch(err => console.error('Email webhook error:', err));
-        emailCaptured = true;
+        try {
+          const res = await fetch('https://embrooks.org/webhook/trope-matcher-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error(`Webhook failed: ${res.status}`);
+          emailCaptured = true;
+        } catch (err) {
+          console.error('Email webhook error:', err);
+        }
       }
       renderResults();
     }
